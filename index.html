@@ -1,0 +1,255 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta Regresiva</title>
+    <meta name="description" content="Cronómetro de cuenta regresiva sincronizado con la hora oficial de Venezuela para el gran evento del 3 de octubre de 2026.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="Imagenes/Logo.png">
+</head>
+<body>
+    <!-- Background glowing shapes for atmosphere -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    
+    <div class="container">
+        <header>
+            <div class="badge" id="timezone-badge">
+                <span class="pulse-dot"></span> Zona Horaria: <span id="target-timezone-label">Cargando...</span>
+            </div>
+            <h1>Tiempo Restante</h1>
+            <p class="subtitle">Destino: Fecha objetivo</p>
+            
+            <!-- Date Picker Panel -->
+            <div class="date-picker-panel">
+                <form id="date-picker-form" class="picker-form">
+                    <div class="input-group">
+                        <label for="target-date-picker">Fecha y Hora Objetivo:</label>
+                        <input type="datetime-local" id="target-date-picker" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="timezone-select">Zonas Horaria:</label>
+                        <select id="timezone-select">
+                            <option value="America/Caracas">Venezuela (Caracas, UTC-4)</option>
+                            <option value="America/Bogota">Colombia / Perú (Bogota, UTC-5)</option>
+                            <option value="America/Argentina/Buenos_Aires">Argentina (Buenos Aires, UTC-3)</option>
+                            <option value="America/Mexico_City">México (CDMX, UTC-6)</option>
+                            <option value="America/New_York">EE.UU. Este (Nueva York, UTC-5/UTC-4)</option>
+                            <option value="Europe/Madrid">España (Madrid, UTC+1/UTC+2)</option>
+                            <option value="UTC">UTC (Tiempo Universal Coordinado)</option>
+                            <option value="local">Zona Horaria de tu Navegador</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary" id="btn-submit">Establecer</button>
+                        <button type="button" id="btn-reset" class="btn btn-secondary">Restaurar</button>
+                    </div>
+                </form>
+            </div>
+        </header>
+
+        <main>
+            <div class="countdown-wrapper" id="countdown-wrapper" aria-label="Tiempo restante" aria-live="polite">
+                <!-- Days Card -->
+                <div class="card" id="card-days">
+                    <div class="card-number-wrapper">
+                        <div class="card-number" id="days">00</div>
+                    </div>
+                    <div class="card-label">Días</div>
+                </div>
+
+                <!-- Hours Card -->
+                <div class="card" id="card-hours">
+                    <div class="card-number-wrapper">
+                        <div class="card-number" id="hours">00</div>
+                    </div>
+                    <div class="card-label">Horas</div>
+                </div>
+
+                <!-- Minutes Card -->
+                <div class="card" id="card-minutes">
+                    <div class="card-number-wrapper">
+                        <div class="card-number" id="minutes">00</div>
+                    </div>
+                    <div class="card-label">Minutos</div>
+                </div>
+
+                <!-- Seconds Card -->
+                <div class="card" id="card-seconds">
+                    <div class="card-number-wrapper">
+                        <div class="card-number" id="seconds">00</div>
+                    </div>
+                    <div class="card-label">Segundos</div>
+                </div>
+            </div>
+
+            <!-- Celebration/Completion screen (Hidden by default) -->
+            <div class="celebration-container" id="celebration">
+                <h2>¡El día ha llegado! 🎉</h2>
+                <p id="celebration-message">El evento seleccionado ya ha comenzado.</p>
+            </div>
+
+            <!-- Detailed units breakdown -->
+            <div class="detailed-section" id="detailed-section">
+                <h3 class="detailed-title">Equivalencias de Tiempo Restante</h3>
+                <div class="detailed-metrics-wrapper" id="detailed-metrics-wrapper">
+                    <!-- Months Card -->
+                    <div class="card card-mini" id="card-months">
+                        <div class="card-number-wrapper-mini">
+                            <span class="card-number-mini" id="months-detail">00</span>
+                        </div>
+                        <div class="card-label-mini">Meses</div>
+                    </div>
+
+                    <!-- Weeks Card -->
+                    <div class="card card-mini" id="card-weeks">
+                        <div class="card-number-wrapper-mini">
+                            <span class="card-number-mini" id="weeks-detail">00</span>
+                        </div>
+                        <div class="card-label-mini">Semanas</div>
+                    </div>
+
+                    <!-- Hours Card -->
+                    <div class="card card-mini" id="card-hours-detail">
+                        <div class="card-number-wrapper-mini">
+                            <span class="card-number-mini" id="hours-detail">0000</span>
+                        </div>
+                        <div class="card-label-mini">Horas Totales</div>
+                    </div>
+
+                    <!-- Minutes Card -->
+                    <div class="card card-mini" id="card-minutes-detail">
+                        <div class="card-number-wrapper-mini">
+                            <span class="card-number-mini" id="minutes-detail">000000</span>
+                        </div>
+                        <div class="card-label-mini">Minutos Totales</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-dropdown">
+                <button type="button" id="calendar-toggle" class="btn btn-secondary dropdown-btn" aria-expanded="false">
+                    Ver calendario del recorrido
+                    <span class="dropdown-arrow">▾</span>
+                </button>
+
+                <div class="calendar-panel" id="calendar-panel" aria-hidden="true" inert>
+                    <div class="calendar-panel-header">
+                        <div class="calendar-card">
+                            <span>Inicio</span>
+                            <strong id="calendar-start-date">Hoy</strong>
+                        </div>
+                        <div class="calendar-card">
+                            <span>Meta</span>
+                            <strong id="calendar-target-date">Fecha no seleccionada</strong>
+                        </div>
+                    </div>
+
+                    <div class="calendar-timeline" id="calendar-timeline">
+                        <div class="timeline-track">
+                            <div class="timeline-point timeline-start"></div>
+                            <div class="timeline-line"></div>
+                            <div class="timeline-point timeline-end"></div>
+                        </div>
+                        <div class="timeline-labels">
+                            <span id="calendar-start-label"></span>
+                            <span id="calendar-mid-label"></span>
+                            <span id="calendar-end-label"></span>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid" id="calendar-grid">
+                        <p class="calendar-empty">Selecciona una fecha para ver el recorrido completo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="events-section" aria-labelledby="events-title">
+                <div class="events-header">
+                    <p class="section-kicker">Agenda</p>
+                    <h3 id="events-title">Eventos</h3>
+                </div>
+
+                <div class="events-toolbar">
+                    <button type="button" id="open-event-modal-btn" class="btn btn-primary add-event-btn">Agregar eventos</button>
+                </div>
+
+                <div class="event-list-wrapper">
+                    <div id="events-list" class="events-list" aria-live="polite"></div>
+                </div>
+            </section>
+        </main>
+
+        <div class="event-modal-backdrop" id="event-modal-backdrop" aria-hidden="true" inert>
+            <div class="event-modal" role="dialog" aria-modal="true" aria-labelledby="event-modal-title">
+                <button type="button" class="event-modal-close" id="event-modal-close" aria-label="Cerrar ventana de evento">×</button>
+                <p class="section-kicker">Nuevo evento</p>
+                <h3 id="event-modal-title">Agregar evento</h3>
+
+                <form id="event-modal-form" class="event-form modal-form">
+                    <div class="input-group compact-field modal-field modal-name-field">
+                        <label for="modal-event-name">Nombre del evento</label>
+                        <input type="text" id="modal-event-name" placeholder="Ej. Cita importante" maxlength="80" required>
+                    </div>
+
+                    <div class="input-group compact-field modal-field modal-date-display">
+                        <label for="modal-event-date">Fecha</label>
+                        <input type="date" id="modal-event-date" class="modal-date-input">
+                    </div>
+
+                    <div class="input-group compact-field modal-field modal-repeat-field">
+                        <label class="checkbox-label" for="modal-repeat-weekly">
+                            <input type="checkbox" id="modal-repeat-weekly">
+                            <span>Repetir cada semana</span>
+                        </label>
+                    </div>
+
+                    <div class="input-group compact-field modal-field modal-weekday-field hidden-repeat-option">
+                        <label for="modal-repeat-weekday">Día de la semana</label>
+                        <select id="modal-repeat-weekday">
+                            <option value="1">Lunes</option>
+                            <option value="2">Martes</option>
+                            <option value="3">Miércoles</option>
+                            <option value="4">Jueves</option>
+                            <option value="5">Viernes</option>
+                            <option value="6">Sábado</option>
+                            <option value="0">Domingo</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group compact-field modal-field modal-until-field hidden-repeat-option">
+                        <label for="modal-repeat-until">Repetir hasta</label>
+                        <input type="date" id="modal-repeat-until">
+                    </div>
+
+                    <div class="input-group compact-field modal-field">
+                        <label for="modal-event-start">Hora de inicio</label>
+                        <input type="time" id="modal-event-start" required>
+                    </div>
+
+                    <div class="input-group compact-field modal-field">
+                        <label for="modal-event-end">Hora de fin</label>
+                        <input type="time" id="modal-event-end" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary add-event-btn">Guardar evento</button>
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            <div class="info-section">
+                <p class="current-date-info">Hora oficial del lugar seleccionado: <span id="timezone-current-time">Cargando hora oficial...</span></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
