@@ -1,6 +1,3 @@
-// Countdown Timer with Custom Timezone Selector and Time Breakdowns
-
-// Get DOM elements
 const elements = {
     days: document.getElementById('days'),
     hours: document.getElementById('hours'),
@@ -11,14 +8,12 @@ const elements = {
     celebrationMessage: document.getElementById('celebration-message'),
     timezoneTime: document.getElementById('timezone-current-time'),
     
-    // Detailed metrics elements
     detailedSection: document.getElementById('detailed-section'),
     monthsDetail: document.getElementById('months-detail'),
     weeksDetail: document.getElementById('weeks-detail'),
     hoursDetail: document.getElementById('hours-detail'),
     minutesDetail: document.getElementById('minutes-detail'),
     
-    // Form, inputs and badge elements
     datePickerForm: document.getElementById('date-picker-form'),
     datePickerInput: document.getElementById('target-date-picker'),
     timezoneSelect: document.getElementById('timezone-select'),
@@ -52,7 +47,6 @@ const elements = {
 
 elements.calendarToggle?.setAttribute('aria-controls', 'calendar-panel');
 
-// Store last rendered values to prevent unnecessary animation triggers
 const lastValues = {
     days: null,
     hours: null,
@@ -64,7 +58,6 @@ const lastValues = {
     minutesDetail: null
 };
 
-// Timezone display labels
 const timezoneLabels = {
     'America/Caracas': 'Venezuela (Caracas, UTC-4)',
     'America/Bogota': 'Colombia / Perú (Bogota, UTC-5)',
@@ -76,7 +69,6 @@ const timezoneLabels = {
     'local': 'Tu Zona Horaria Local'
 };
 
-// App settings state
 let currentTimezone;
 let targetDateString;
 let targetTimestamp;
@@ -87,10 +79,6 @@ let modalTriggerElement = null;
 const EVENT_STORAGE_KEY = 'custom-events';
 const EVENTS_RENDER_INTERVAL = 5000;
 
-/**
- * Calculates the default year of the next October 3rd at 00:00:00 Venezuela Time (UTC-4).
- * 00:00:00 VET corresponds to 04:00:00 UTC.
- */
 function getVenezuelaDefaultYear() {
     const now = new Date();
     const currentYear = now.getUTCFullYear();
@@ -102,32 +90,25 @@ function getVenezuelaDefaultYear() {
     return currentYear;
 }
 
-/**
- * Formats a Date object to YYYY-MM-DDTHH:MM for the HTML input fields
- */
+
 function formatDateForInput(date) {
     const pad = num => String(num).padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-/**
- * Calculates the exact UTC timestamp of a local datetime string interpreted in a target timezone
- */
+
 function getTimestampInTimezone(dateTimeStr, timeZone) {
     if (timeZone === 'local') {
         return new Date(dateTimeStr).getTime();
     }
     
-    // Parse datetime parts
     const [datePart, timePart] = dateTimeStr.split('T');
     const [year, month, day] = datePart.split('-').map(Number);
     const [hour, minute] = timePart.split(':').map(Number);
     
-    // Create UTC Date representing these components
     const utcDate = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
     
     try {
-        // Format this UTC date in the target timezone to find the timezone shift
         const formatter = new Intl.DateTimeFormat('en-US', {
             timeZone,
             year: 'numeric',
@@ -152,7 +133,6 @@ function getTimestampInTimezone(dateTimeStr, timeZone) {
             Number(map.second)
         ));
         
-        // Calculate offset difference
         const offset = utcDate.getTime() - targetLocal.getTime();
         return utcDate.getTime() + offset;
     } catch (e) {
@@ -161,9 +141,7 @@ function getTimestampInTimezone(dateTimeStr, timeZone) {
     }
 }
 
-/**
- * Formats the current time in the selected timezone
- */
+
 function getTargetTimeFormatted() {
     const options = {
         timeZone: currentTimezone === 'local' ? undefined : currentTimezone,
@@ -183,18 +161,11 @@ function getTargetTimeFormatted() {
     }
 }
 
-/**
- * Estimates the months remaining using an average month length.
- * This allows results like 1.9 meses en lugar de solo un número entero.
- */
 function calculateMonths(diffMilliseconds) {
     const averageMonthMs = 1000 * 60 * 60 * 24 * 30.436875; // Promedio de días por mes
     return Math.max(0, diffMilliseconds / averageMonthMs);
 }
 
-/**
- * Recalculates the target timestamp and updates subtitle and badge labels
- */
 function formatTargetDateLabel(date) {
     const options = { dateStyle: 'long', timeStyle: 'short' };
     return date.toLocaleString('es-VE', options);
@@ -218,10 +189,8 @@ function updateTargetTimestamp() {
 
     targetTimestamp = getTimestampInTimezone(targetDateString, currentTimezone);
     
-    // Update badge timezone label
     elements.targetTimezoneLabel.textContent = timezoneLabels[currentTimezone] || currentTimezone;
     
-    // Update header subtitle
     const date = new Date(targetTimestamp);
     elements.subtitle.textContent = `Destino: ${formatTargetDateLabel(date)}`;
     updateCalendarPanel();
@@ -297,7 +266,6 @@ function renderCalendarDayCards(startDate, endDate, referenceDate) {
         day: '2-digit',
         month: 'short'
     });
-    // Prepare month hue map and range for proximity calculations
     const monthHues = [0, 330, 280, 220, 160, 120, 80, 40, 30, 15, 10, 200]; // hues per month (Jan..Dec)
     const msPerDay = 1000 * 60 * 60 * 24;
     const startMidnight = new Date(startDate);
@@ -320,16 +288,14 @@ function renderCalendarDayCards(startDate, endDate, referenceDate) {
         const progress = isToday ? dayProgress : current.getTime() < todayMidnight.getTime() ? 100 : 0;
         const progressLabel = isToday ? `${progress}% completado` : current.getTime() < todayMidnight.getTime() ? 'Terminado' : 'Pendiente';
 
-        // Determine month-based hue and proximity (closeness to the target)
         const monthIdx = current.getMonth();
         const hue = monthHues[monthIdx % monthHues.length];
         const daysUntilTarget = Math.ceil((target.getTime() - current.getTime()) / msPerDay);
-        const closeness = 1 - Math.min(1, Math.max(0, daysUntilTarget / totalRangeDays)); // 0 far, 1 near
-        const lightMin = 32; // far lightness
-        const lightMax = 78; // near lightness
+        const closeness = 1 - Math.min(1, Math.max(0, daysUntilTarget / totalRangeDays)); 
+        const lightMin = 32; 
+        const lightMax = 78; 
         const lightness = Math.round(lightMin + closeness * (lightMax - lightMin));
-        const saturation = 62; // percent
-        // Build softer palette values for nicer visuals
+        const saturation = 62; 
         const bgLightness = Math.max(18, lightness - 8);
         const bgAlpha = 0.14;
         const borderLightness = Math.max(22, lightness - 4);
@@ -396,9 +362,7 @@ function updateCalendarPanel() {
     });
 }
 
-/**
- * Updates a digit element with pop animation when its value changes
- */
+
 function updateDigit(element, value, key) {
     const formatted = String(value).padStart(2, '0');
     if (lastValues[key] !== formatted) {
@@ -406,14 +370,11 @@ function updateDigit(element, value, key) {
         lastValues[key] = formatted;
         
         element.classList.remove('number-pop');
-        void element.offsetWidth; // Force reflow
+        void element.offsetWidth; 
         element.classList.add('number-pop');
     }
 }
 
-/**
- * Updates a digit with local formatting and pop animation
- */
 function updateDigitFormatted(element, value, key) {
     const numericValue = Number(value);
     const options = {
@@ -427,26 +388,21 @@ function updateDigitFormatted(element, value, key) {
         lastValues[key] = formatted;
         
         element.classList.remove('number-pop');
-        void element.offsetWidth; // Force reflow
+        void element.offsetWidth; 
         element.classList.add('number-pop');
     }
 }
 
-/**
- * Main update loop
- */
 function updateCountdown() {
     const nowObj = new Date();
     const now = nowObj.getTime();
 
     if (targetTimestamp) {
         const diff = targetTimestamp - now;
-        
-        // Update targeted timezone live clock in footer
+
         elements.timezoneTime.textContent = getTargetTimeFormatted();
         
         if (diff <= 0) {
-            // Time's up
             elements.countdownWrapper.style.display = 'none';
             elements.detailedSection.style.display = 'none';
             elements.celebration.style.display = 'block';
@@ -454,30 +410,25 @@ function updateCountdown() {
             const targetDate = new Date(targetTimestamp);
             elements.celebrationMessage.textContent = `El evento programado para ${formatTargetDateLabel(targetDate)} ya ha comenzado.`;
         } else {
-            // Show count downs
             elements.countdownWrapper.style.display = 'grid';
             elements.detailedSection.style.display = 'block';
             elements.celebration.style.display = 'none';
             
-            // Main countdown numbers
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
             
-            // Detailed metrics numbers
             const months = calculateMonths(diff);
             const weeks = diff / (1000 * 60 * 60 * 24 * 7);
             const totalHours = Math.floor(diff / (1000 * 60 * 60));
             const totalMinutes = Math.floor(diff / (1000 * 60));
             
-            // Render main dials
             updateDigit(elements.days, days, 'days');
             updateDigit(elements.hours, hours, 'hours');
             updateDigit(elements.minutes, minutes, 'minutes');
             updateDigit(elements.seconds, seconds, 'seconds');
             
-            // Render detailed cards with decimals for months and weeks
             updateDigitFormatted(elements.monthsDetail, months, 'monthsDetail');
             updateDigitFormatted(elements.weeksDetail, weeks, 'weeksDetail');
             updateDigitFormatted(elements.hoursDetail, totalHours, 'hoursDetail');
@@ -880,9 +831,6 @@ function getSelectedCalendarDateFromModal() {
     return new Date().toISOString().split('T')[0];
 }
 
-/**
- * Initializes settings, loading from localStorage or defaulting to October 3rd VET
- */
 function initializeSettings() {
     const savedDate = localStorage.getItem('customTargetDate');
     const savedTz = localStorage.getItem('customTargetTimezone');
@@ -894,7 +842,6 @@ function initializeSettings() {
     }
     currentTimezone = savedTz || 'America/Caracas';
     
-    // Set fields
     elements.datePickerInput.value = targetDateString;
     elements.timezoneSelect.value = currentTimezone;
     initializeEventFormDefaults();
@@ -903,7 +850,6 @@ function initializeSettings() {
     updateCountdown();
 }
 
-// Form submit listener to establish custom date and timezone
 elements.datePickerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const dateVal = elements.datePickerInput.value;
@@ -921,7 +867,6 @@ elements.datePickerForm.addEventListener('submit', (e) => {
     }
 });
 
-// Reset event listener to clear date selection and return to initial empty state
 elements.btnReset.addEventListener('click', () => {
     localStorage.removeItem('customTargetDate');
     localStorage.removeItem('customTargetTimezone');
@@ -936,7 +881,6 @@ elements.btnReset.addEventListener('click', () => {
     updateCountdown();
 });
 
-// Toggle calendar dropdown panel
 elements.calendarToggle.addEventListener('click', () => {
     const isOpen = elements.calendarPanel.classList.toggle('open');
     elements.calendarToggle.classList.toggle('open', isOpen);
@@ -988,7 +932,6 @@ window.addEventListener('keydown', (event) => {
     }
 });
 
-// Start app
 initializeSettings();
 updateCalendarPanel();
 updateCountdown();
