@@ -12,7 +12,6 @@
     <link rel="icon" href="Imagenes/Logo.png">
 </head>
 <body>
-    <!-- Background glowing shapes for atmosphere -->
     <div class="bg-glow bg-glow-1"></div>
     <div class="bg-glow bg-glow-2"></div>
     
@@ -24,7 +23,6 @@
             <h1>Tiempo Restante</h1>
             <p class="subtitle">Destino: Fecha objetivo</p>
             
-            <!-- Date Picker Panel -->
             <div class="date-picker-panel">
                 <form id="date-picker-form" class="picker-form">
                     <div class="input-group">
@@ -56,7 +54,6 @@
 
         <main>
             <div class="countdown-wrapper" id="countdown-wrapper" aria-label="Tiempo restante" aria-live="polite">
-                <!-- Days Card -->
                 <div class="card" id="card-days">
                     <div class="card-number-wrapper">
                         <div class="card-number" id="days">00</div>
@@ -64,7 +61,6 @@
                     <div class="card-label">Días</div>
                 </div>
 
-                <!-- Hours Card -->
                 <div class="card" id="card-hours">
                     <div class="card-number-wrapper">
                         <div class="card-number" id="hours">00</div>
@@ -72,7 +68,6 @@
                     <div class="card-label">Horas</div>
                 </div>
 
-                <!-- Minutes Card -->
                 <div class="card" id="card-minutes">
                     <div class="card-number-wrapper">
                         <div class="card-number" id="minutes">00</div>
@@ -80,7 +75,6 @@
                     <div class="card-label">Minutos</div>
                 </div>
 
-                <!-- Seconds Card -->
                 <div class="card" id="card-seconds">
                     <div class="card-number-wrapper">
                         <div class="card-number" id="seconds">00</div>
@@ -89,17 +83,14 @@
                 </div>
             </div>
 
-            <!-- Celebration/Completion screen (Hidden by default) -->
             <div class="celebration-container" id="celebration">
                 <h2>¡El día ha llegado! 🎉</h2>
                 <p id="celebration-message">El evento seleccionado ya ha comenzado.</p>
             </div>
 
-            <!-- Detailed units breakdown -->
             <div class="detailed-section" id="detailed-section">
                 <h3 class="detailed-title">Equivalencias de Tiempo Restante</h3>
                 <div class="detailed-metrics-wrapper" id="detailed-metrics-wrapper">
-                    <!-- Months Card -->
                     <div class="card card-mini" id="card-months">
                         <div class="card-number-wrapper-mini">
                             <span class="card-number-mini" id="months-detail">00</span>
@@ -107,7 +98,6 @@
                         <div class="card-label-mini">Meses</div>
                     </div>
 
-                    <!-- Weeks Card -->
                     <div class="card card-mini" id="card-weeks">
                         <div class="card-number-wrapper-mini">
                             <span class="card-number-mini" id="weeks-detail">00</span>
@@ -115,7 +105,6 @@
                         <div class="card-label-mini">Semanas</div>
                     </div>
 
-                    <!-- Hours Card -->
                     <div class="card card-mini" id="card-hours-detail">
                         <div class="card-number-wrapper-mini">
                             <span class="card-number-mini" id="hours-detail">0000</span>
@@ -123,7 +112,6 @@
                         <div class="card-label-mini">Horas Totales</div>
                     </div>
 
-                    <!-- Minutes Card -->
                     <div class="card card-mini" id="card-minutes-detail">
                         <div class="card-number-wrapper-mini">
                             <span class="card-number-mini" id="minutes-detail">000000</span>
