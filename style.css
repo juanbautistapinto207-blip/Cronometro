@@ -1,4 +1,3 @@
-/* Custom properties for our design system */
 :root {
     --bg-primary: #274C56;
     --card-bg: rgba(39, 76, 86, 0.75);
@@ -20,7 +19,6 @@
     --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Reset and base styles */
 * {
     margin: 0;
     padding: 0;
@@ -45,7 +43,6 @@ body {
     position: relative;
 }
 
-/* Atmospheric Glow Background */
 .bg-glow {
     position: absolute;
     width: 600px;
@@ -80,7 +77,6 @@ body {
     }
 }
 
-/* Main Container Layout */
 .container {
     width: 100%;
     max-width: 900px;
@@ -89,7 +85,6 @@ body {
     z-index: 1;
 }
 
-/* Header Styles */
 header {
     margin-bottom: 3.5rem;
 }
@@ -162,7 +157,6 @@ h1 {
     letter-spacing: 0.05em;
 }
 
-/* Countdown Grid */
 .countdown-wrapper {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -171,7 +165,6 @@ h1 {
     transition: var(--transition-smooth);
 }
 
-/* Time Card Styles */
 .card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -224,7 +217,6 @@ h1 {
     font-variant-numeric: tabular-nums;
 }
 
-/* Animation on number change */
 .number-pop {
     animation: popEffect 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -249,7 +241,6 @@ h1 {
     color: var(--text-secondary);
 }
 
-/* Celebration State styles (Hidden initially) */
 .celebration-container {
     display: none;
     background: linear-gradient(135deg, rgba(246, 226, 179, 0.16) 0%, rgba(217, 108, 44, 0.18) 100%);
@@ -291,7 +282,6 @@ h1 {
     }
 }
 
-/* Footer Section */
 footer {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     padding-top: 2rem;
@@ -321,7 +311,6 @@ footer {
     font-variant-numeric: tabular-nums;
 }
 
-/* Date Picker Panel styles */
 .date-picker-panel {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.06);
@@ -376,7 +365,6 @@ footer {
         border-color: var(--accent-gold);
         box-shadow: 0 0 10px rgba(231, 168, 78, 0.25);
 }
-/* Select input styling */
 .input-group select {
     width: 100%;
     background: rgba(10, 15, 30, 0.55);
@@ -409,7 +397,6 @@ footer {
     color: #ffffff;
 }
 
-/* Styled calendar indicator for Chrome/Safari */
 ::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
@@ -1124,7 +1111,6 @@ footer {
     transform: translateY(-2px);
 }
 
-/* Detailed Metrics Section */
 .detailed-section {
     margin-top: 3.5rem;
     margin-bottom: 2rem;
@@ -1203,7 +1189,6 @@ footer {
     }
 }
 
-/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
     .detailed-metrics-wrapper {
         grid-template-columns: repeat(2, 1fr);
